@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1">
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		
+		<title>TAG TALK 兴趣圈 | 帖子</title>
+		<!-- Loading third party fonts -->
+		<!-- Loading main css file -->
+		<link rel="stylesheet" href="style.css">
+		
+	</head>
+
+
+	<body>
+		
+		<div id="site-content">
+			<div class="container">
+				
+				<header class="site-header">
+					<a href="兴趣圈.html" id="branding">
+						<img src="images/logo.png" alt="site name" class="logo">
+						<div class="logo-copy">
+							<h1 class="site-title">TAG TALK</h1>
+							<small class="site-description">遇见真实的自己</small>
+						</div>
+					</a>
+
+					<h2 id="branding" style="font-weight: 100;">
+						<div id="userInfo">
+							未知用户
+						</div>
+					</h2>
+
+					<!-- Default snippet for navigation -->
+					<div class="main-navigation">
+						<button type="button" class="menu-toggle"><i class="fa fa-bars"></i></button>
+						<ul class="menu">
+							<li class="menu-item"><a href="登入.html">登入</a></li>
+							<li class="menu-item"><a href="注册.html">注册</a></li>
+							<li class="menu-item"><a href="兴趣圈.html">兴趣圈</a></li>
+							<li class="menu-item"><a href="发布帖子.html">发布帖子</a></li>
+						</ul> <!-- .menu -->
+					</div> <!-- .main-navigation -->
+
+					<div class="mobile-navigation"></div>
+				</header>
+
+				<main class="main-content">
+					<div class="blog-post col-md-9">
+						<article class="post">
+							<div class="entry-detail">
+								<h2 class="entry-title"><a href="#"></a></h2>
+								
+								<div class="entry-meta">
+									<img src="images/icon-comment.png" alt="">
+									<span class="comments-count"></span>
+									<p></p>
+								</div>
+								
+								<div class="entry-content">
+									<p></p>
+								</div>
+							</div>
+						</article>
+					</div>
+					
+					<div class="row">
+						<div class="blog-post col-md-9">
+							<article class="post">
+
+								<div id="postDetailContainer">
+									<!-- 帖子详情将被动态插入到这里 -->
+								</div>
+
+								<section class="comment-list">
+									<h2>评论</h2>
+
+									<ul class="comments">
+										<main class="main-content">
+											<!-- 其他内容... -->
+											<ul class="comments" id="commentsList">
+												<!-- 评论将被动态加载到这里 -->
+											</ul>
+											<!-- 其他内容... -->
+										</main>
+		
+									</ul>
+								</section>
+								<section class="comment-form">
+									<h3>添加一条评论</h3>
+									<h5>(评论后记得刷新一下噢)</h5>
+									<form id="Comment-form">
+										<div class="row">
+											<div class="col-md-12">
+												<textarea id="content" placeholder="写下你的评论......"></textarea>
+												<div class="text-right">
+													<input type="submit" value="添加评论">
+												</div>
+											</div>
+										</div>
+									</form>
+								</section>
+
+								
+							</article>
+						</div>
+						<div class="aside siderbar col-md-3">
+							<div class="widget">
+								<h3 class="widget-title">兴趣圈分类</h3>
+								<ul class="bullet">
+									<li>原神</li>
+									<li>mygo</li>
+									<li>冰激凌企鹅</li>
+									<li>科比布莱恩特</li>
+									<li>黑尾巴吗喽</li>
+								</ul>
+							</div>
+
+							<div class="widget recent-posts-widget">
+								<h3 class="widget-title">最近活跃用户</h3>
+								<ul>
+									<li>
+										
+										<small class="date">1</small>
+									</li>
+									<li>
+										
+										<small class="date">千早爱音</small>
+									</li>
+									<li>
+										
+										<small class="date">黑吗喽</small>
+									</li>
+									<li>
+										
+										<small class="date">kope pryant</small>
+									</li>
+								</ul>
+							</div>
+
+						</div>
+					</div>
+					
+				</main>
+
+				<footer class="site-footer">
+					<p class="copy">
+						许可证明
+						苏ICP备XXXXXXXXX号
+						苏公网安备XXXXXXXXXXXX号
+						版权所有：XXXXXXXXXX有限公司
+					</p>
+				</footer>
+
+			</div>
+		</div>
+
+		<script>
+			axios.defaults.baseURL = 'http://127.0.0.1:7001';
+
+			document.addEventListener('DOMContentLoaded', function() {
+            const title = localStorage.getItem('postTitle');
+            loadPostDetails(title);
+        	});
+
+			async function loadPostDetails(title) {
+				try {
+					const response = await axios.get(`/file/${title}`);
+					const post = response.data;
+					document.querySelector('.entry-title a').textContent = post.title;
+					document.querySelector('.comments-count').textContent = post.user;
+					document.querySelector('.entry-meta p').textContent = "兴趣圈：" + post.category;
+					document.querySelector('.entry-content p').textContent = post.content;
+				} catch (error) {
+					console.error('Failed to load post details:', error);
+				}
+			}
+
+			document.getElementById('Comment-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                comment();
+            });
+        
+			async function comment() {
+				const content = document.getElementById('content').value;
+				const user = JSON.parse(localStorage.getItem('userInfo')).username;
+				const title = localStorage.getItem('postTitle');
+
+				if (!content) {
+					alert("内容不能为空！");
+					return;
+				}
+
+				try {
+					const response = await axios.post('/comments', {
+						user,
+						title,
+						content
+					});
+
+					// 检查后端返回的状态码和success字段
+					if (response.data.success) {
+						alert("评论成功！");
+						loadComments(); // 仅在成功后刷新评论列表
+						window.location.reload();
+					} else {
+						alert(response.data.body.message); // 显示后端返回的错误消息
+					}
+				} catch (error) {
+					console.error('Comment submission error:', error);
+					alert('评论失败，请检查网络连接或联系管理员。');
+				}
+			}
+
+			async function loadComments() {
+				try {
+					const title = localStorage.getItem('postTitle');
+					// 使用 axios 发送 GET 请求到后端，获取评论数据
+					const response = await axios.get(`/renew?title=${encodeURIComponent(title)}`);
+					console.log(response.data)
+
+					// 检查响应数据中的 success 属性，如果成功则更新评论列表
+					if (response.data.success) {
+						const comments = response.data.data;
+						const commentsList = document.getElementById('commentsList');
+
+						// 清空现有的评论列表
+						commentsList.innerHTML = '';
+
+						// 遍历评论数据并创建评论元素
+						comments.forEach(comment => {
+							const commentElement = document.createElement('li');
+							commentElement.className = 'comment';
+							commentElement.innerHTML = `
+								<div class="comment-author">
+									<strong>${comment.user}</strong>
+								</div>
+								<div class="comment-content">
+									<p>${comment.content}</p>
+								</div>
+							`;
+							commentsList.appendChild(commentElement);
+						});
+					} else {
+						console.error('Failed to load comments:', response.data.message);
+						// 可以在这里添加错误处理逻辑，例如显示错误消息
+					}
+				} catch (error) {
+					console.error('Failed to load comments:', error);
+					// 可以在这里添加错误处理逻辑，例如显示错误消息
+				}
+			}
+
+			// 当页面加载完成后，调用 loadComments 函数
+			document.addEventListener('DOMContentLoaded', loadComments);
+
+			document.getElementById('Comment-form').addEventListener('submit', function(event) {
+				event.preventDefault();
+				comment();
+			});
+
+			document.addEventListener('DOMContentLoaded', loadComments);
+
+			window.addEventListener('load', () => {
+                    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                    if (userInfo) {
+                        document.getElementById('userInfo').textContent = `欢迎, ${userInfo.username}`;
+                    }
+                });
+		</script>
+		
+	</body>
+
+</html>

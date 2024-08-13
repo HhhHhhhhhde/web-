@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1">
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		
+		<title>TAG TALK 兴趣圈 | 发布帖子</title>
+		<!-- Loading third party fonts -->
+		<style>
+			.button {
+				background-color: #dc415a;
+				border: none;
+				color: black;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;
+				margin: 4px 2px;
+				cursor: pointer;
+			}
+		</style>
+		
+		<!-- Loading main css file -->
+		<link rel="stylesheet" href="style.css">
+
+	</head>
+
+
+	<body>
+		
+		<div id="site-content">
+			<div class="container">
+				
+				<header class="site-header">
+					<a href="兴趣圈.html" id="branding">
+						<img src="images/logo.png" alt="site name" class="logo">
+						<div class="logo-copy">
+							<h1 class="site-title">TAG TALK</h1>
+							<small class="site-description">遇见真实的自己</small>
+						</div>
+					</a>
+
+					<h2 id="branding" style="font-weight: 100;">
+						<div id="userInfo">
+							未知用户
+						</div>
+					</h2>
+
+					<!-- Default snippet for navigation -->
+					<div class="main-navigation">
+						<button type="button" class="menu-toggle"><i class="fa fa-bars"></i></button>
+						<ul class="menu">
+							<li class="menu-item"><a href="登入.html">登入</a></li>
+							<li class="menu-item"><a href="注册.html">注册</a></li>
+							<li class="menu-item"><a href="兴趣圈.html">兴趣圈</a></li>
+							<li class="menu-item"><a href="发布帖子.html">发布帖子</a></li>
+						</ul> <!-- .menu -->
+					</div> <!-- .main-navigation -->
+
+					<div class="mobile-navigation"></div>
+				</header>
+
+				<main class="main-content">
+					<div class="row">
+						<div class="aside siderbar col-md-12">
+							<div class="contact-form">
+								<form id="postForm">
+									<h1 style="font-weight: 100;">创建帖子</h1>
+									<input type="text" name="title" id="title" placeholder="标题...">
+									
+									<select id="category" style="font-size:smaller">
+										<option value="">请选择或添加新兴趣圈....</option>
+										<option value="genshin">原神</option>
+										<option value="mygo">mygo</option>
+										<option value="icecream_penguin">冰激淋企鹅</option>
+										<option value="kobe">科比布莱恩特</option>
+									</select>
+									<button type="button" onclick="addCategory()" class="button">添加</button>
+									<input type="text" id="newCategory" placeholder="新增兴趣圈...">
+									
+									<textarea id="content" name="content" placeholder="正文..."></textarea>
+									<input type="submit" value="提交">
+								</form>
+							</div>
+						</div>
+					</div>
+				</main>
+				
+				<footer class="site-footer">
+					<p class="copy">
+						许可证明
+						苏ICP备XXXXXXXXX号
+						苏公网安备XXXXXXXXXXXX号
+						版权所有：XXXXXXXXXX有限公司
+					</p>
+				</footer>
+				
+				<script>
+					axios.defaults.baseURL = 'http://127.0.0.1:7001';
+					document.getElementById('postForm').addEventListener('submit', async (e) => {
+					e.preventDefault();
+					const title = document.getElementById('title').value;
+					const category = document.getElementById('category').value;
+					const content = document.getElementById('content').value;
+
+					const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+					if(!userInfo){
+						alert('要发布帖子,请先登录!');
+						return;
+					}
+
+					const user = `${JSON.parse(localStorage.getItem('userInfo')).username}`;
+
+					if (!title.trim() || !category.trim() || !content.trim()) {
+						alert('标题、分类和正文都必须填写');
+						return;
+					}
+					
+					console.log(title.trim());
+
+					const formData = new FormData();
+					formData.append('user', user);
+					formData.append('title', title);
+					formData.append('category', category);
+					formData.append('content', content);
+
+					try {
+						// 使用 JSON 格式发送数据
+						const response = await axios.post('/post', {
+							user: user,
+							title: title,
+							category: category,
+							content: content
+						});
+
+						console.log(response.data);
+						alert('帖子上传成功');
+					} catch (error) {
+						console.error(error);
+						alert('帖子上传失败');
+					}
+				});
+
+				window.addEventListener('load', () => {
+                    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                    if (userInfo) {
+                        document.getElementById('userInfo').textContent = `欢迎, ${userInfo.username}`;
+                    }
+                });
+
+				function addCategory() {
+					var categoryInput = document.getElementById('newCategory');
+					var categorySelect = document.getElementById('category');
+					var newCategory = categoryInput.value.trim();
+
+					if (newCategory) {
+						// 检查选项是否已存在
+						for (var i = 0; i < categorySelect.options.length; i++) {
+							if (categorySelect.options[i].value === newCategory.toLowerCase().replace(/\s+/g, '_')) {
+								alert('该兴趣圈已存在');
+								return;
+							}
+						}
+						// 创建新的选项并添加到下拉菜单
+						var newOption = document.createElement('option');
+						newOption.value = newCategory.toLowerCase().replace(/\s+/g, '_'); // 将输入转换为小写并替换空格为下划线
+						newOption.textContent = newCategory;
+						categorySelect.appendChild(newOption);
+						categorySelect.value = newOption.value; // 可选：添加后自动选择
+						categoryInput.value = ''; // 清空输入框
+					} else {
+						alert('请输入兴趣圈名称');
+					}
+				}
+
+				</script>
+	</body>
+
+</html>

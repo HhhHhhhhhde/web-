@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1">
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+		<title>TAG TALK 兴趣圈 | 注册</title>
+		<!-- Loading third party fonts -->
+		
+		<!-- Loading main css file -->
+		<link rel="stylesheet" href="style.css">
+		
+		<!--[if lt IE 9]>
+		<script src="js/ie-support/html5.js"></script>
+		<script src="js/ie-support/respond.js"></script>
+		<![endif]-->
+		</head> 
+	<body>
+		<div id="site-content">
+			<div class="container">
+				
+				<header class="site-header">
+					<a href="兴趣圈.html" id="branding">
+						<img src="images/logo.png" alt="site name" class="logo">
+						<div class="logo-copy">
+							<h1 class="site-title">TAG TALK</h1>
+							<small class="site-description">遇见真实的自己</small>
+						</div>
+					</a>
+
+					<h2 id="branding" style="font-weight: 100;">
+						<div id="userInfo">
+							未知用户
+						</div>
+					</h2>
+		
+					<!-- Default snippet for navigation -->
+					<div class="main-navigation">
+						<button type="button" class="menu-toggle"><i class="fa fa-bars"></i></button>
+						<ul class="menu">
+							<li class="menu-item"><a href="登入.html">登入</a></li>
+							<li class="menu-item"><a href="注册.html">注册</a></li>
+							<li class="menu-item"><a href="兴趣圈.html">兴趣圈</a></li>
+							<li class="menu-item"><a href="发布帖子.html">发布帖子</a></li>
+						</ul> <!-- .menu -->
+					</div> <!-- .main-navigation -->
+		
+					<div class="mobile-navigation"></div>
+				</header>
+					
+				<main class="main-content">  
+					<div class="page">  
+						<div class="contact-form">  
+							<form id="registerForm">  
+								<h3>注册</h3>  
+								<p>请填入你的新账号和密码</p>  
+								<input type="text" id="username" placeholder="你的用户名...">  
+								<input type="password" id="password" placeholder="你的密码...">
+								<input type="password" id="confirmPassword" placeholder="请再次输入密码...">    
+								<input type="submit" value="注册">  
+							</form>  
+						</div>  
+					</div>  
+				</main>
+		
+				<footer class="site-footer">
+					<p class="copy">
+						许可证明
+						苏ICP备XXXXXXXXX号
+						苏公网安备XXXXXXXXXXXX号
+						版权所有：XXXXXXXXXX有限公司
+					</p>
+				</footer>
+		
+			</div>
+		</div>
+		
+		
+		
+		<script>
+			axios.defaults.baseURL = 'http://127.0.0.1:7001'; // 确保基地址是正确的
+		  
+			document.getElementById('registerForm').addEventListener('submit', function(event) {
+			  event.preventDefault(); // 阻止表单的默认提交行为
+			  if (!checkPasswords()) {
+				// 如果密码检查失败，则不执行注册函数
+				return;
+			  }
+			  register(); // 调用注册函数
+			});
+		  
+			// 检查密码是否匹配的函数
+			function checkPasswords() {
+			  const password = document.getElementById('password').value;
+			  const confirmPassword = document.getElementById('confirmPassword').value;
+			  if (password !== confirmPassword) {
+				alert('两次输入的密码不同，请重新输入！');
+				return false;
+			  }
+			  return true; // 密码匹配
+			}
+		  
+			async function register() {
+			  const username = document.getElementById('username').value;
+			  const password = document.getElementById('password').value;
+		  
+			  try {
+				const response = await axios.post('/register', {
+				  username,
+				  password
+				});
+		  
+				if (response.data.success) {
+				  alert(response.data.message); // 注册成功
+				  window.location.href = "登入.html";// 跳转到登录页面
+				} else {
+				  alert(response.data.message); // 注册失败
+				}
+			  } catch (error) {
+				console.error('Register error:', error);
+				alert('注册请求失败，请检查网络连接或联系管理员。');
+			  }
+			}
+
+			window.addEventListener('load', () => {
+                    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                    if (userInfo) {
+                        document.getElementById('userInfo').textContent = `欢迎, ${userInfo.username}`;
+                    }
+                });
+		  </script>
+	</body>
+</html>
